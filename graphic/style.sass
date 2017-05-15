@@ -1,0 +1,96 @@
+
+// style config
+$color0     : black
+$color1     : rgb(60, 60, 60)
+$color2     : gray
+$color3     : white
+$bigFont    : 100px
+$bigFont    : 45px
+$middleFont : 40px
+$smallFont  : 14px
+$glPadding  : 12px
+
+// init style for browsers
+html
+	width  : 100%
+	height : 100%
+	*
+		border     : 0px red solid
+		box-sizing : border-box
+		border-collapse : collapse
+	body
+		margin : 0
+		width  : 100%
+		height : 100%
+
+// custom styles
+body
+	background-color : $color3
+	font-family      : 'theinhardt'
+	white-space: nowrap
+	font-size: 0px
+
+@keyframes horizontalScroll
+	0%
+		transform: translateX(-0%)
+	25%
+		transform: translateX(-0%)
+	33%
+		transform: translateX(-100%)
+	66%
+		transform: translateX(-200%)
+	100%
+		transform: translateX(-300%)
+
+.screen
+	display: inline-block
+	width: 100%
+	height: 100%
+	white-space: normal
+	vertical-align: top
+	font-size: $bigFont
+	//animation: horizontalScroll 10s infinite alternate ease-in-out
+	.header
+		font-size: 60px
+		font-weight: bold
+		text-align: center
+		padding: 40px 0px 0px 40px
+		height: 10%
+	.list, .info
+		height: 90%
+		padding: $glPadding
+		overflow-x: hidden
+		.event
+			height: 25%
+			background-color: red
+			margin-bottom: $glPadding
+			padding: $glPadding
+			.title
+				font-weight: bold
+			.time
+				font-size: $middleFont
+			.room
+				font-size: $middleFont
+		.event:last-child
+			margin-bottom: 0px
+
+	&.current
+		display: run-in
+	&.upcoming
+		display: run-in
+	&.global
+		display: run-in
+
+
+.pink
+	background-color : #DC75AE !important
+.green
+	background-color : #94CFA0 !important
+.blue
+	background-color : #98D7DF !important
+.orange
+	background-color : #F49E59 !important
+.yellow
+	background-color : #E9E15A !important
+.purple
+	background-color : #8885BF !important

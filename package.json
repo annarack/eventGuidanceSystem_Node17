@@ -1,0 +1,30 @@
+{
+  "name": "aenna",
+  "version": "1.3.0",
+  "description": "this is the first website of aenna",
+  "main": "app.js",
+  "author": "tosha",
+  "license": "ISC",
+  "scripts": {
+    "client": "cross-env NODE_ENV=client.server webpack-dev-server --config ./webpack.js",
+    "server": "cross-env NODE_ENV=client.watch webpack --progress --config ./webpack.js",
+	"build": "cross-env NODE_ENV=client.build webpack --progress --config ./webpack.js"
+  },
+  "dependencies": {
+    "cross-env": "^3.2.4"
+  },
+  "devDependencies": {
+    "babel-core": "^6.17.0",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015-native-modules": "^6.9.0",
+    "webpack": "^2.1.0-beta.19",
+    "webpack-dev-server": "^2.4.0",
+	"css-loader": "^0.25.0",
+	"file-loader": "^0.10.1",
+	"loader-utils": "^1.0.3",
+	"node-sass": "^3.11.2",
+	"sass-loader": "^4.0.2",
+	"style-loader": "^0.13.1",
+	"url-loader": "^0.5.7"
+  }
+}
