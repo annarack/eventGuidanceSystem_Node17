@@ -12,12 +12,12 @@ export default [
 		room     : 'Thumb',
 		start    : '14:00',
 		end      : '18:00',
-		name     : 'VVVV for newbies (EN) part 1/2'
+		name     : 'VVVV for newbies (EN) part 2/2'
 	},
 	{
 		building : 'Naxoshalle',
 		room     : 'Thumb',
-		start    : '18:00',
+		start    : '16:00',
 		end      : '20:00',
 		name     : 'VVVV for newbies (EN) part 1/2'
 	},
@@ -25,7 +25,7 @@ export default [
 		building : 'Naxoshalle',
 		room     : 'Ring',
 		start    : '10:00',
-		end      : '13:00',
+		end      : '17:30',
 		name     : 'Basic DirectX11 shading'
 	},
 
@@ -90,7 +90,7 @@ export default [
 		room     : 'Cardiac',
 		start    : '17:00',
 		end      : '20:30',
-		name     : 'OpenFrameworks master class'
+		name     : 'Connecting things to the internet of things'
 	},
 	{
 		building : 'Mousonturm',
@@ -101,9 +101,16 @@ export default [
 	},
 	{
 		building : 'Mousonturm',
+		room     : 'raum3',
+		start    : '15:00',
+		end      : '19:00',
+		name     : 'Veranstaltung XYZ'
+	},
+	{
+		building : 'Mousonturm',
 		room     : 'Saal',
 		start    : '15:00',
 		end      : '17:00',
 		name     : 'Realtime Physics in 3D'
-	},
+	}
 ]
