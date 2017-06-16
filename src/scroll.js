@@ -77,7 +77,8 @@ let initScrollAnimation = parent => {
 	let timeLine = []
 	if (items.length > config.itemsProScreen) {
 		let screenNumber = Math.ceil(items.length / config.itemsProScreen)
-		let lastScreenChildNumber = items.length % config.itemsProScreen
+		let mod = items.length % config.itemsProScreen
+		let lastScreenChildNumber = (mod == 0? config.itemsProScreen: mod)
 		let timeAcc  = 0
 		for (let i = 0; i < screenNumber; i ++) {
 			let get = n => {

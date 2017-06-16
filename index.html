@@ -3,25 +3,27 @@
 <html>
 	<head>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1">
 		<title>NODE 17</title>
-		<!-- <link rel="stylesheet" href="./graphic/style.css"> -->
 	</head>
 	<body>
-		<div class="screen current green">
+		<div id="logo"></div>
+		<div class="screen current">
 			<div class="header">CURRENT</div>
 			<div class="list" id="current"></div>
 		</div>
-		<div class="screen upcoming purple">
+		<div class="screen upcoming">
 			<div class="header">UPCOMING</div>
 			<div class="list" id="upcoming"></div>
 		</div>
-		<div class="screen global blue">
+		<div class="screen global">
 			<div class="header">GLOBAL INFOS</div>
-			<div class="info" id="global">content</div>
+			<div class="list" id="global"></div>
 		</div>
-		<div class="screen pink">
-			content
+		<div class="screen graphic">
+			<div id="graphicContent"></div>
 		</div>
 	</body>
-	<script src="./build/index.js" charset="utf-8"></script>
+	<script src="./config.js"></script>
+	<script src="./build/index.js"></script>
 </html>

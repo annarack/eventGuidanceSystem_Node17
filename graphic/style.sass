@@ -1,13 +1,15 @@
+// https://jsfiddle.net/gxu0v7fc/
 
 // style config
 $color0     : black
-$color1     : rgba(black, .5)
+$color1     : rgba(black, .8)
 $color2     : gray
 $color3     : white
-$bigFont    : 50px
-$middleFont : 45px
-$smallFont  : 14px
-$glPadding  : 20px
+$bigFont    : 4.5vmin
+$middleFont : 4vmin
+$smallFont  : 3vmin
+$glPadding  : 2vmin
+//20px
 
 // init style for browsers
 html
@@ -27,13 +29,22 @@ html
 		background-attachment : fixed
 		-webkit-user-select   : none
 
+@keyframes horizontalMove
+	0%   {scrollLeft: 0px;}
+	25%  {scrollLeft: 200px;}
+	50%  {scrollLeft: 100px;}
+	75%  {scrollLeft: 200px;}
+	100% {scrollLeft: 0px;}
+
 // custom styles
 body
-	overflow: hidden
+	overflow         : hidden
 	background-color : $color3
 	font-family      : 'theinhardt'
-	white-space: nowrap
-	font-size: 0px
+	white-space      : nowrap
+	font-size        : 0px
+	// animation 		 : .5s horizontalMove infinite alternate ease-in-out
+
 
 #logo
 	position : fixed
@@ -46,59 +57,116 @@ body
 	background-size     : contain
 	background-repeat   : no-repeat
 
+#graphicContent
+	position : absolute
+	top      : 0px
+	left     : 0px
+	right    : 0px
+	bottom   : 0px
+	background-image    : url('./DesigningHope_Full_big.png')
+	background-repeat   : no-repeat
+	background-size     : contain
+	background-position : center
+
+
+
+
 .screen
 	position       : relative
+	z-index		   : 2
 	display        : inline-block
 	width          : 100%
 	height         : 100%
 	white-space    : normal
 	vertical-align : top
 	font-size      : $bigFont
-	// animation: horizontalScroll 20s infinite ease-in-out
 	.header
-		font-size: 60px
-		font-weight: bold
-		text-align: left
-		padding: $glPadding * 2
-		height: $glPadding * 6
+		font-size   : 6vmin
+		font-weight : bold
+		text-align  : left
+		padding     : $glPadding * 1.5
+		height      : $glPadding * 5.5
 	.list
-		height: -webkit-calc(100% - #{$glPadding * 6})
-		padding: $glPadding
-		overflow: hidden
+		height   : -webkit-calc(100% - #{$glPadding * 5.5})
+		padding  : $glPadding
+		overflow : hidden
 		.event
-			height: -webkit-calc(25% - #{.75 * $glPadding})
-			margin-bottom: $glPadding
-			padding: $glPadding * 2
-			box-shadow: 0 $glPadding/2 $glPadding rgba(black, .3)
+			position      : relative
+			overflow      : hidden
+			height        : -webkit-calc(20% - #{.75 * $glPadding})
+			margin-bottom : $glPadding
+			padding       : $glPadding * 1
+			box-shadow    : 0 $glPadding/2 $glPadding rgba(black, .3)
 			.title
-				font-size: $bigFont
-				font-weight: bold
-				text-transform: uppercase
+				font-size      : $bigFont
+				font-weight    : bold
+				text-transform : uppercase
 			.time
-				font-size: $middleFont
-				color: $color1
+				font-size : $middleFont
+				color     : $color1
 			.room
-				font-size: $middleFont
-				color: $color1
+				font-size : $middleFont
+				color     : $color1
 			.info
-				font-size: $middleFont
-				color: darkred
-				text-transform: uppercase
+				display   : inline-block
+				padding   : 10px 16px 7px
+				font-size : $smallFont
+				color     : white
+				text-transform   : uppercase
+				border-radius    : 5px
+				background-color : darkred
+				animation : .5s pulse infinite alternate ease-in-out
+				@keyframes pulse
+					from
+						transform: scale(.993,.97)
+					to
+						transform: scale(1, 1)
 		.event:last-child
 			margin-bottom: 0px
 
 		.globalInfo
-			height: -webkit-calc(25% - #{.75 * $glPadding})
-			margin-bottom: $glPadding
-			padding: $glPadding * 2
-			box-shadow: 0 $glPadding/2 $glPadding rgba(black, .3)
+			overflow : hidden
+			position : relative
+			height   : -webkit-calc(25% - #{.75 * $glPadding})
+			padding  : $glPadding * 1
+			margin-bottom : $glPadding
+			box-shadow    : 0 $glPadding/2 $glPadding rgba(black, .3)
+			&.short
+				padding-right: 20vh
 			.title
-				font-size: $bigFont
-				font-weight: bold
-				text-transform: uppercase
+				font-size      : $bigFont
+				font-weight    : bold
+				text-transform : uppercase
 			.text
-				font-size: $middleFont
-				color: $color1
+				font-size     : $middleFont
+				color         : $color1
+				padding-right : $glPadding * 2
+			.infoImage
+				position : absolute
+				right    : 0
+				top      : 0
+				width    : 20vh
+				height   : 100%
+				background-position : center
+				background-size     : cover
+
+@media (min-width: 100rem)
+	.screen .event
+		.title
+			max-width: 70%
+			padding-right: $glPadding
+		.time
+			position : absolute
+			right    : 0
+			top      : 20%
+			width    : 30%
+		.room
+			position : absolute
+			right    : 0
+			top      : 50%
+			width    : 30%
+		.info
+			max-width: 70%
 
 	&.current
 		display: run-in
@@ -119,7 +187,7 @@ body
 .blue
 	background-color : #98D7DF !important
 .orange
-	background-color : #F49E59 !important
+	background-color : rgba(#F49E59, .7) !important
 .yellow
 	background-color : #E9E15A !important
 .purple
