@@ -29,12 +29,7 @@ html
 		background-attachment : fixed
 		-webkit-user-select   : none
 
-@keyframes horizontalMove
-	0%   {scrollLeft: 0px;}
-	25%  {scrollLeft: 200px;}
-	50%  {scrollLeft: 100px;}
-	75%  {scrollLeft: 200px;}
-	100% {scrollLeft: 0px;}
+
 
 // custom styles
 body
@@ -43,7 +38,6 @@ body
 	font-family      : 'theinhardt'
 	white-space      : nowrap
 	font-size        : 0px
-	// animation 		 : .5s horizontalMove infinite alternate ease-in-out
 
 
 #logo
@@ -70,7 +64,6 @@ body
 
 
 
-
 .screen
 	position       : relative
 	z-index		   : 2
@@ -80,6 +73,10 @@ body
 	white-space    : normal
 	vertical-align : top
 	font-size      : $bigFont
+	transition 	   : transform 1s ease-in-out
+
+	// animation      : horizontalScroll 20s infinite alternate ease-in-out
+
 	.header
 		font-size   : 6vmin
 		font-weight : bold
@@ -87,70 +84,73 @@ body
 		padding     : $glPadding * 1.5
 		height      : $glPadding * 5.5
 	.list
-		height   : -webkit-calc(100% - #{$glPadding * 5.5})
-		padding  : $glPadding
-		overflow : hidden
-		.event
-			position      : relative
-			overflow      : hidden
-			height        : -webkit-calc(20% - #{.75 * $glPadding})
-			margin-bottom : $glPadding
-			padding       : $glPadding * 1
-			box-shadow    : 0 $glPadding/2 $glPadding rgba(black, .3)
-			.title
-				font-size      : $bigFont
-				font-weight    : bold
-				text-transform : uppercase
-			.time
-				font-size : $middleFont
-				color     : $color1
-			.room
-				font-size : $middleFont
-				color     : $color1
-			.info
-				display   : inline-block
-				padding   : 10px 16px 7px
-				font-size : $smallFont
-				color     : white
-				text-transform   : uppercase
-				border-radius    : 5px
-				background-color : darkred
-				animation : .5s pulse infinite alternate ease-in-out
-				@keyframes pulse
-					from
-						transform: scale(.993,.97)
-					to
-						transform: scale(1, 1)
-		.event:last-child
-			margin-bottom: 0px
+		height     : -webkit-calc(100% - #{$glPadding * 5.5})
+		overflow   : hidden
+		.listScroller
+			height     : 100%
+			padding    : $glPadding
+			transition : transform 1s ease-in-out
+			.event
+				position      : relative
+				overflow      : hidden
+				height        : -webkit-calc(20% - #{.75 * $glPadding})
+				margin-bottom : $glPadding
+				padding       : $glPadding * 1
+				box-shadow    : 0 $glPadding/2 $glPadding rgba(black, .3)
+				.title
+					font-size      : $bigFont
+					font-weight    : bold
+					text-transform : uppercase
+				.time
+					font-size : $middleFont
+					color     : $color1
+				.room
+					font-size : $middleFont
+					color     : $color1
+				.info
+					display   : inline-block
+					padding   : 10px 16px 7px
+					font-size : $smallFont
+					color     : white
+					text-transform   : uppercase
+					border-radius    : 5px
+					background-color : darkred
+					// animation : .5s pulse infinite alternate ease-in-out
+					@keyframes pulse
+						from
+							transform: scale(.993,.97)
+						to
+							transform: scale(1, 1)
+			.event:last-child
+				margin-bottom: 0px
 
-		.globalInfo
-			overflow : hidden
-			position : relative
-			height   : -webkit-calc(25% - #{.75 * $glPadding})
-			padding  : $glPadding * 1
-			margin-bottom : $glPadding
-			box-shadow    : 0 $glPadding/2 $glPadding rgba(black, .3)
-			&.short
-				padding-right: 20vh
-			.title
-				font-size      : $bigFont
-				font-weight    : bold
-				text-transform : uppercase
-			.text
-				font-size     : $middleFont
-				color         : $color1
-				padding-right : $glPadding * 2
-			.infoImage
-				position : absolute
-				right    : 0
-				top      : 0
-				width    : 20vh
-				height   : 100%
-				background-position : center
-				background-size     : cover
+			.globalInfo
+				overflow : hidden
+				position : relative
+				height   : -webkit-calc(25% - #{.75 * $glPadding})
+				padding  : $glPadding * 1
+				margin-bottom : $glPadding
+				box-shadow    : 0 $glPadding/2 $glPadding rgba(black, .3)
+				&.short
+					padding-right: 20vh
+				.title
+					font-size      : $bigFont
+					font-weight    : bold
+					text-transform : uppercase
+				.text
+					font-size     : $middleFont
+					color         : $color1
+					padding-right : $glPadding * 2
+				.infoImage
+					position : absolute
+					right    : 0
+					top      : 0
+					width    : 20vh
+					height   : 100%
+					background-position : center
+					background-size     : cover
 
-@media (min-width: 100rem)
+@media (min-width: 60rem)
 	.screen .event
 		.title
 			max-width: 70%

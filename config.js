@@ -2,7 +2,7 @@
 var config = {
 	monitorID 		   : 'infoCounter',
 	titleLength        : 50,
-	itemDuration       : 3, // second
+	itemDuration       : 2, // second
 	transitionDuration : 2, // second
 	itemsProScreen     : 5,
 	fps : 30,

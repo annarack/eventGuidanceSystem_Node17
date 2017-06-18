@@ -111,27 +111,26 @@ let initScrollAnimation = parent => {
 
 let scrollParent = (parent, end) => {
 	let timeLine = initScrollAnimation(parent)
-	let fix = .1
 	let start = new Date()
 	let job = () => {
 		let t = (new Date() - start) / 1000 // elapsed time
 		for (let i = 0; i < timeLine.length; i ++) {
 			// if the time is inside of transitional window
 			let seq = timeLine[i]
-			if (seq.from.time < fix + t && t - fix < seq.to.time) {
-				let n = map(t, seq.from.time, seq.to.time, 0, 1) // convert to normal number 0-1
-				let e = easeInOut(4)(n) // apply ease function
-				let y = map(e, 0, 1, seq.from.top, seq.to.top) // convert to coordinates
-				parent.scrollTop = y + 2// scroll parent
+			// console.log(seq);
+			if (seq.from.time < t && t < seq.to.time) {
+				parent.style.transform = `translateY(${-seq.to.top}px)`
 				break
 			}
 		}
 		if (t > timeLine[timeLine.length - 1].to.time) {
+			console.log('delete vertical scroll job');
 			end && end()
 			return true // delete me from animation list
 		}
 	}
 	// add animation to jobs
+	console.log('add vertical scroll job');
 	jobs.add(job)
 }
 
@@ -140,7 +139,7 @@ export let y = end => {
 	for (let i = 0; i < screens.length; i ++) {
 		if (screens[i].style.display != 'none') {
 			let left = screens[i].getBoundingClientRect().left
-			let list = screens[i].querySelector('.list')
+			let list = screens[i].querySelector('.list .listScroller')
 			if (-3 < left) {
 				if (list)
 					scrollParent(list, end)
@@ -153,7 +152,7 @@ export let y = end => {
 }
 
 export let x = (() => {
-	let transitionTime = 3
+	let transitionTime = 1
 	let screens        = document.querySelectorAll('.screen')
 	return end => { // next
 		let start      = new Date()
@@ -171,17 +170,20 @@ export let x = (() => {
 			}
 		}
 		let job = () => {
-			let d = (new Date() - start) / 1000 // elapsed time
-			let n = map(d, 0, transitionTime, 0, 1) // convert to normal number 0-1
-			let e = easeInOut(4)(n) // apply ease function
-			let t = map(e, 0, 1, screenFrom, screenTo) // convert to coordinates
-			document.body.scrollLeft = t
+			let d = parseInt((new Date() - start) / 1000) // elapsed time
+			// if (d == transitionTime)
+			for (var i = 0; i < screens.length; i ++)
+				screens[i].style.transform = `translateX(${-screenTo}px)`
+			// document.body.scrollLeft = t
 			// if done delete us from animation list
-			if (n > 1) {
+
+			if (d > transitionTime) {
 				end && end()
+				console.log('delete horizontal scroll');
 				return true // delete me from animation list
 			}
 		}
+		console.log('add horizontal scroll job');
 		// add animation to jobs
 		jobs.add(job)
 	}

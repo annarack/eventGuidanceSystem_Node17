@@ -26,8 +26,8 @@ let subscribeTo = `/screens/${config.monitorID}/${d.getDate()}.${d.getMonth()+1}
 console.log('date: '+ d.getHours()) ;
 console.log('subscribe to: ' + subscribeTo);
 
-let currentTime = new Date("June 16, 2017 17:00:00")
-let timeSpan    = new Date("June 16, 2017 17:00:00")
+let currentTime = new Date("June 18, 2017 17:00:00")
+let timeSpan    = new Date("June 18, 2017 17:00:00")
 // let currentTime   = new Date()
 // //events starttime should be earlier than timeSpan to be displayed as upcoming
 // let timeSpan      = new Date()
@@ -61,10 +61,10 @@ let fillCurrent = model => {
 				<div class="room">${data.building}, ${data.room}</div>
 				${data.info? `<div class="info">${data.info}</div>`: ``}
 			</div>`)
-	if(templates == '')
+	if (templates == '')
 		document.querySelector('.screen.current').style.display = 'none'
 	else
-		document.querySelector('.current .list').innerHTML = templates
+		document.querySelector('.current .listScroller').innerHTML = templates
 }
 
 let fillUpcoming = model => {
@@ -84,7 +84,7 @@ let fillUpcoming = model => {
 	if(templates == '')
 		document.querySelector('.screen.upcoming').style.display = 'none'
 	else
-		document.querySelector('.upcoming .list').innerHTML = templates
+		document.querySelector('.upcoming .listScroller').innerHTML = templates
 }
 
 
@@ -109,7 +109,7 @@ let fillGlobal = model => {
 	if(templates == '')
 		document.querySelector('.screen.global').style.display = 'none'
 	else {
-		document.querySelector('.global .list').innerHTML = templates
+		document.querySelector('.global .list .listScroller').innerHTML = templates
 	}
 }
 // <div class="infoImage"><img src=${src}></div>
