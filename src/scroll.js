@@ -70,8 +70,9 @@ let map = (value, aMin, aMax, bMin, bMax, clamp) => {
 	)
 }
 
+// Initialisation for vertical scroll
 let initScrollAnimation = parent => {
-	// other stuff
+
 	let items = parent.querySelectorAll('.event')
 	if(items.length == 0) items = parent.querySelectorAll('.globalInfo')
 	let timeLine = []
@@ -109,6 +110,8 @@ let initScrollAnimation = parent => {
 	return timeLine
 }
 
+
+// vertical scroll animation
 let scrollParent = (parent, end) => {
 	let timeLine = initScrollAnimation(parent)
 	let start = new Date()
@@ -124,13 +127,11 @@ let scrollParent = (parent, end) => {
 			}
 		}
 		if (t > timeLine[timeLine.length - 1].to.time) {
-			console.log('delete vertical scroll job');
 			end && end()
 			return true // delete me from animation list
 		}
 	}
 	// add animation to jobs
-	console.log('add vertical scroll job');
 	jobs.add(job)
 }
 
@@ -158,13 +159,19 @@ export let x = (() => {
 		let start      = new Date()
 		let screenFrom = 0
 		let screenTo   = 0
-		// find the current one automaticaly
-		for (let i = 0; i < screens.length; i ++) {
+		let visibleScreens = []
+		for (var i = 0; i < screens.length; i++) {
 			if (screens[i].style.display != 'none') {
-				let left = screens[i].getBoundingClientRect().left
+					visibleScreens.push(screens[i])
+			}
+		}
+		// find the current one automaticaly
+		for (let i = 0; i < visibleScreens.length; i ++) {
+			if (visibleScreens[i].style.display != 'none') {
+				let left = visibleScreens[i].getBoundingClientRect().left
 				if (-3 < left) {
-					screenFrom = screens[i].offsetLeft
-					screenTo   = screens[(i + 1) % screens.length].offsetLeft
+					screenFrom = visibleScreens[i].offsetLeft
+					screenTo   = visibleScreens[(i + 1) % visibleScreens.length].offsetLeft
 					break
 				}
 			}
@@ -179,11 +186,10 @@ export let x = (() => {
 
 			if (d > transitionTime) {
 				end && end()
-				console.log('delete horizontal scroll');
+				// console.log('delete horizontal scroll');
 				return true // delete me from animation list
 			}
 		}
-		console.log('add horizontal scroll job');
 		// add animation to jobs
 		jobs.add(job)
 	}

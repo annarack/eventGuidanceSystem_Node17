@@ -1,6 +1,6 @@
 
 var config = {
-	monitorID 		   : 'infoCounter',
+	monitorID 		   : 'screen1',
 	titleLength        : 50,
 	itemDuration       : 2, // second
 	transitionDuration : 2, // second
