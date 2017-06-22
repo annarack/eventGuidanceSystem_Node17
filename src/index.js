@@ -4,7 +4,20 @@ import model from './module'
 import * as scroll from './scroll'
 import mqtt from 'mqtt'
 // var client  = mqtt.connect('ws://192.168.2.147:9001')
-var client  = mqtt.connect(config.mqttBroker)
+
+let mqttBroker
+let disableScroll
+let monitorID
+
+let loadConfig = (() => {
+	mqttBroker = config.mqttBroker
+	disableScroll = config.disableScroll
+	monitorID = config.monitorID
+})()
+
+
+let client  = mqtt.connect(mqttBroker)
+
 
 
 let currentTime = new Date("June 26, 2017 12:00:00")
@@ -19,14 +32,24 @@ console.log('timespan: ' + timeSpan);
 
 
 
-let subscribeTo = `screens/${config.monitorID}/${currentTime.getDate()}.${currentTime.getMonth()+1}`
-console.log('subscribe to: ' + subscribeTo);
+
+let subscribeToEvents = `screens/${monitorID}/${currentTime.getDate()}.${currentTime.getMonth()+1}`
+console.log('subscribe to: ' + subscribeToEvents);
+
+let itemDurationTop      = `screens/${monitorID}/itemDuration`
+let gfxScreenDurationTop = `screens/${monitorID}/graphicScreenDuration`
+let disableScrollTop     = `screens/${monitorID}/disableScroll`
+let showScreenTop        = `screens/${monitorID}/showScreen`
 
 
 client.on('connect', () => {
-	client.subscribe(subscribeTo)
+	client.subscribe(subscribeToEvents)
 	client.subscribe('globals')
-	client.publish('presence', 'Hello mqtt')
+	client.subscribe(itemDurationTop)
+	client.subscribe(gfxScreenDurationTop)
+	client.subscribe(disableScrollTop)
+	client.subscribe(showScreenTop)
+	client.publish('presence', 'Node Client Connected')
 	console.log('connected to mqtt server')
 })
 
@@ -37,17 +60,27 @@ client.on('message', (topic, message) => {
 	console.log('received new data');
 	console.log(model);
 
-	if (topic == subscribeTo) {
+	if (topic == subscribeToEvents) {
 		fillCurrent(model)
 		fillUpcoming(model)
-		if (!config.disableScroll)
+		if (!disableScroll)
 			scroll.reload()
 	}
 	if (topic == 'globals') {
 		fillGlobal(model)
-		if (!config.disableScroll)
+		if (!disableScroll)
 			scroll.reload()
 	}
+	if (topic == itemDurationTop)
+		scroll.setItemDuration = message
+	if (topic == gfxScreenDurationTop)
+		scroll.setGraphicScreenDuration = message
+	if (topic == disableScrollTop)
+		disableScroll = message
+	if (topic == showScreenTop)
+		scroll.showScreen(message)
+
+
 })
 
 
@@ -144,8 +177,9 @@ window.addEventListener('load', e => {
 	fillCurrent(model)
 	fillUpcoming(model)
 	fillGlobal(model)
+	scroll.start()
 
-	if (!config.disableScroll) {
-		scroll.start()
-	}
+	// if (!disableScroll) {
+	// 	scroll.start()
+	// }
 })

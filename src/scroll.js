@@ -1,4 +1,59 @@
 
+let itemDuration
+let graphicScreenDuration
+let disableScroll
+
+let loadConfig = (() => {
+	itemDuration = config.itemDuration
+	graphicScreenDuration = config.graphicScreenDuration
+	disableScroll = config.disableScroll
+})()
+
+export let setItemDuration = d => itemDuration = d
+export let setGraphicScreenDuration = d => graphicScreenDuration = d
+window.setDisableScroll = b => {
+	disableScroll = b
+	// if(disableScroll == 0) reload()
+}
+
+let getRandomMinute = (min, max) => {
+	min = min*60000;
+	max = max*60000;
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}
+
+
+let changeImage = () => {
+	console.log("random")
+	let content = document.getElementById('graphicContent')
+	// change image to avocado
+	content.style.backgroundImage = "url('/graphic/test.gif')"
+
+	setTimeout(function() {
+			// change image back after 3 minutes
+			content.style.backgroundImage = "url('/graphic/DesigningHope_Full_big.png')"
+			content.style.backgroundRepeat = "no-repeat"
+	}, 3*60000)
+
+	content.style.backgroundRepeat = "no-repeat"
+	content.style.backgroundSize = "contain"
+	content.style.backgroundPosition = "center"
+}
+
+let loopImages = () => {
+    var rand = getRandomMinute(0.5,1)
+	console.log('will change image after: ' + rand);
+    setTimeout(() => {
+            changeImage()
+            loopImages()
+    }, rand)
+}
+
+loopImages()
+
+
 /*
 	toshas pattern:
 	let MakeObject = params => {
@@ -54,6 +109,8 @@ let jobs = (() => {
 	}
 })()
 
+
+
 const easeIn    = p => t => Math.pow(t, p)
 const easeOut   = p => t => (1 - Math.abs(Math.pow(t-1, p)))
 const easeInOut = p => t => t<.5? easeIn(p)(t*2)/2: easeOut(p)(t*2 - 1)/2+0.5
@@ -89,7 +146,7 @@ let initScrollAnimation = parent => {
 				return items[a].offsetTop - items[0].offsetTop
 			}
 			// screenDuration
-			timeAcc += config.itemDuration *
+			timeAcc += itemDuration *
 				(i < screenNumber - 1? config.itemsProScreen: lastScreenChildNumber)
 			let screenDurationStart = timeAcc
 			// transitionDuration
@@ -102,7 +159,7 @@ let initScrollAnimation = parent => {
 	} else
 		timeLine.push({
 			from : {time : 0, top  : 0},
-			to   : {time : items.length * config.itemDuration, top : 0}
+			to   : {time : items.length * itemDuration, top : 0}
 		})
 	//  4s   0px - 100px  5s
 	//  9s 100px - 200px 10s
@@ -136,6 +193,7 @@ let scrollParent = (parent, end) => {
 }
 
 export let y = end => {
+	console.log('should now scroll vertically');
 	let screens = document.querySelectorAll('.screen')
 	for (let i = 0; i < screens.length; i ++) {
 		if (screens[i].style.display != 'none') {
@@ -145,7 +203,7 @@ export let y = end => {
 				if (list)
 					scrollParent(list, end)
 				else
-					setTimeout(end, config.nonScrollScreenDuration * 1000)
+					setTimeout(end, graphicScreenDuration * 1000)
 				break
 			}
 		}
@@ -156,6 +214,8 @@ export let x = (() => {
 	let transitionTime = 1
 	let screens        = document.querySelectorAll('.screen')
 	return end => { // next
+		console.log('should now scroll horizontally');
+
 		let start      = new Date()
 		let screenFrom = 0
 		let screenTo   = 0
@@ -195,7 +255,10 @@ export let x = (() => {
 	}
 })()
 
+
+
 window.showScreen = id => {
+	let start      = new Date()
 	let screens        = document.querySelectorAll('.screen')
 	let visibleScreens = []
 	for (var i = 0; i < screens.length; i++) {
@@ -204,15 +267,28 @@ window.showScreen = id => {
 		}
 	}
 	let left = visibleScreens[id].offsetLeft
-	for (var i = 0; i < visibleScreens.length; i ++)
-		visibleScreens[i].style.transform = `translateX(${-left}px)`
-	reload()
+
+	let job = () => {
+		let d = parseInt((new Date() - start) / 1000) // elapsed time
+
+		for (var i = 0; i < visibleScreens.length; i ++)
+			visibleScreens[i].style.transform = `translateX(${-left}px)`
+
+		if (d > 1) {
+			reload()
+			return true // delete me from animation list
+		}
+	}
+	jobs.add(job)
 }
+
+
 
 // main function for continously switching between horizontal and vertical scrolling
 let dir = false
 export let start = () => {
-	if (dir) x(start)
+	console.log('disableScroll is set to: ' + disableScroll);
+	if (dir && !disableScroll) x(start)
 	else y(start)
 	dir = !dir
 }
