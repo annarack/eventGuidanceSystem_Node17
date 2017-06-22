@@ -3,9 +3,8 @@ import '../graphic/style.sass'
 import model from './module'
 import * as scroll from './scroll'
 import mqtt from 'mqtt'
-// var client  = mqtt.connect('ws://192.168.96.147:9001')
-var client  = mqtt.connect('mqtt://test.mosquitto.org:8080')
-
+// var client  = mqtt.connect('ws://192.168.2.147:9001')
+var client  = mqtt.connect(config.mqttBroker)
 
 
 let currentTime = new Date("June 26, 2017 12:00:00")
@@ -14,6 +13,7 @@ let timeSpan    = new Date("June 26, 2017 12:00:00")
 // //events starttime should be earlier than timeSpan to be displayed as upcoming
 // let timeSpan      = new Date()
 timeSpan.setHours(timeSpan.getHours()+2)
+timeSpan.setMinutes(timeSpan.getMinutes()+ 50)
 console.log('currentTime: ' + currentTime);
 console.log('timespan: ' + timeSpan);
 
@@ -40,19 +40,16 @@ client.on('message', (topic, message) => {
 	if (topic == subscribeTo) {
 		fillCurrent(model)
 		fillUpcoming(model)
-		scroll.reload()
+		if (!config.disableScroll)
+			scroll.reload()
 	}
 	if (topic == 'globals') {
 		fillGlobal(model)
-		scroll.reload()
+		if (!config.disableScroll)
+			scroll.reload()
 	}
-
 })
 
-
-
-
-// document.querySelector('.screen.current').style.display = 'none'
 
 let timeToDate = time => {
 	let timeParts = time.split(':')
@@ -60,13 +57,12 @@ let timeToDate = time => {
 	// let dateTime = currentTime // --> wenn spaeter hours etc gesetzt wird, wird currenttime ueberschrieben !!!
 
 	let dateTime = new Date("June 26, 2017 12:00:00")
-	// if (timeParts[1] <= 6)
-	// 	dateTime.setDate(dateTime.getDate()+1)
+	if (timeParts[0] <= 6)
+		dateTime.setDate(dateTime.getDate()+1)
 	dateTime.setHours(timeParts[0])
 	dateTime.setMinutes(timeParts[1])
 	dateTime.setSeconds('00')
 
-	// console.log('parsed time to date: '  +  dateTime);
 	return dateTime
 }
 
@@ -75,9 +71,6 @@ let sortEvents = (a,b) =>
 
 let fillCurrent = model => {
 	let templates = ''
-	// console.log(model);
-	// console.log(model.events);
-	// console.log(model.events[0].room);
 
 	model.events
 		.filter(event =>
@@ -130,13 +123,12 @@ let fillGlobal = model => {
 	let templates = ''
 	model.globalInfos
 		.forEach(data => {
-			// console.log(data.image)
 			if(data.title != '' || data.text != ''){
 				templates +=
 				`<div class="globalInfo orange ${data.image? `short`: ``}" >
 					<div class="title">${data.title}</div>
 					<div class="text">${data.text}</div>
-					${data.image? `<div class="infoImage" style="background-image:${data.image}"></div>`: ``}
+					${data.image? `<div class="infoImage" style=\'background-image:${data.image}\'></div>`: ``}
 				</div>`
 			}
 	})
@@ -147,12 +139,13 @@ let fillGlobal = model => {
 		document.querySelector('.global .list .listScroller').innerHTML = templates
 	}
 }
-// <div class="infoImage"><img src=${src}></div>
 
 window.addEventListener('load', e => {
 	fillCurrent(model)
 	fillUpcoming(model)
 	fillGlobal(model)
 
-	scroll.start()
+	if (!config.disableScroll) {
+		scroll.start()
+	}
 })

@@ -1,6 +1,6 @@
 
 /*
-	toshas pattern :*
+	toshas pattern:
 	let MakeObject = params => {
 		let variable = 10
 		return {
@@ -179,8 +179,8 @@ export let x = (() => {
 		let job = () => {
 			let d = parseInt((new Date() - start) / 1000) // elapsed time
 			// if (d == transitionTime)
-			for (var i = 0; i < screens.length; i ++)
-				screens[i].style.transform = `translateX(${-screenTo}px)`
+			for (var i = 0; i < visibleScreens.length; i ++)
+				visibleScreens[i].style.transform = `translateX(${-screenTo}px)`
 			// document.body.scrollLeft = t
 			// if done delete us from animation list
 
@@ -195,6 +195,20 @@ export let x = (() => {
 	}
 })()
 
+window.showScreen = id => {
+	let screens        = document.querySelectorAll('.screen')
+	let visibleScreens = []
+	for (var i = 0; i < screens.length; i++) {
+		if (screens[i].style.display != 'none') {
+				visibleScreens.push(screens[i])
+		}
+	}
+	let left = visibleScreens[id].offsetLeft
+	for (var i = 0; i < visibleScreens.length; i ++)
+		visibleScreens[i].style.transform = `translateX(${-left}px)`
+	reload()
+}
+
 // main function for continously switching between horizontal and vertical scrolling
 let dir = false
 export let start = () => {
@@ -207,6 +221,7 @@ export let stop = () => jobs.clear()
 
 export let reload = () => {
 	stop()
-	document.body.scrollLeft = 0
+	// document.body.scrollLeft = 0
+	dir = false
 	start()
 }
