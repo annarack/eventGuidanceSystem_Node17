@@ -1,23 +1,19 @@
 
 import '../graphic/style.sass'
-import model from './module'
+import data from './module'
 import * as scroll from './scroll'
 import mqtt from 'mqtt'
 // var client  = mqtt.connect('ws://192.168.2.147:9001')
 
-let mqttBroker
-let disableScroll
-let monitorID
+let model = data
+let mqttBroker = config.mqttBroker
+let disableScroll = config.disableScroll
+let monitorID = config.monitorID
 
-let loadConfig = (() => {
-	mqttBroker = config.mqttBroker
-	disableScroll = config.disableScroll
-	monitorID = config.monitorID
-})()
-
+window.disableScroll = scroll.setDisableScroll
+window.showScreen = scroll.showScreen
 
 let client  = mqtt.connect(mqttBroker)
-
 
 
 let currentTime = new Date("June 26, 2017 12:00:00")
@@ -31,10 +27,7 @@ console.log('currentTime: ' + currentTime);
 console.log('timespan: ' + timeSpan);
 
 
-
-
 let subscribeToEvents = `screens/${monitorID}/${currentTime.getDate()}.${currentTime.getMonth()+1}`
-console.log('subscribe to: ' + subscribeToEvents);
 
 let itemDurationTop      = `screens/${monitorID}/itemDuration`
 let gfxScreenDurationTop = `screens/${monitorID}/graphicScreenDuration`
@@ -56,40 +49,36 @@ client.on('connect', () => {
 client.on('message', (topic, message) => {
 	// message is Buffer
 	// let model = message.toString()
-	let model = JSON.parse(message)
+	message = JSON.parse(message)
+	for (let i in message) if (model[i]) model[i] = message[i]
 	console.log('received new data');
 	console.log(model);
 
 	if (topic == subscribeToEvents) {
 		fillCurrent(model)
 		fillUpcoming(model)
-		if (!disableScroll)
+		if (!scroll.disableScroll)
 			scroll.reload()
 	}
 	if (topic == 'globals') {
 		fillGlobal(model)
-		if (!disableScroll)
+		if (!scroll.disableScroll)
 			scroll.reload()
 	}
 	if (topic == itemDurationTop)
-		scroll.setItemDuration = message
+		scroll.itemDuration = message
 	if (topic == gfxScreenDurationTop)
-		scroll.setGraphicScreenDuration = message
+		scroll.graphicScreenDuration = message
 	if (topic == disableScrollTop)
 		disableScroll = message
 	if (topic == showScreenTop)
 		scroll.showScreen(message)
-
-
 })
 
 
 let timeToDate = time => {
 	let timeParts = time.split(':')
-
-	// let dateTime = currentTime // --> wenn spaeter hours etc gesetzt wird, wird currenttime ueberschrieben !!!
-
-	let dateTime = new Date("June 26, 2017 12:00:00")
+	let dateTime = new Date(currentTime.getTime())
 	if (timeParts[0] <= 6)
 		dateTime.setDate(dateTime.getDate()+1)
 	dateTime.setHours(timeParts[0])
@@ -172,6 +161,76 @@ let fillGlobal = model => {
 		document.querySelector('.global .list .listScroller').innerHTML = templates
 	}
 }
+
+
+
+let getRandomMinute = (min, max) => {
+	min = min*60000;
+	max = max*60000;
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}
+
+
+let changeImage = () => {
+	let content = document.getElementById('graphicContent')
+	// change image to avocado
+	content.style.backgroundImage = "url('/graphic/test.gif')"
+	setTimeout(function() {
+			// change image back after 3 minutes
+			content.style.backgroundImage = "url('/graphic/DesigningHope_Full_big.png')"
+			content.style.backgroundRepeat = "no-repeat"
+	}, 3*60000)
+	content.style.backgroundRepeat = "no-repeat"
+	content.style.backgroundSize = "contain"
+	content.style.backgroundPosition = "center"
+}
+
+let loopImages = () => {
+    var rand = getRandomMinute(1,3)
+	console.log('will change image after: ' + rand);
+    setTimeout(() => {
+            changeImage()
+            loopImages()
+    }, rand)
+}
+loopImages()
+
+let upcomingEventsOnChange = -1
+let eventsOnChange = -1
+
+
+setInterval(() =>{
+	currentTime = new Date("June 26, 2017 12:01:00")
+
+	let currentEventsLength = model.events.filter(event =>
+		timeToDate(event.start) <= currentTime &&
+		currentTime <= timeToDate(event.end)).length
+	let upcomingEventsLength = model.events.filter(eventItem =>
+		timeToDate(eventItem.start) < timeSpan &&
+		timeToDate(eventItem.start) > currentTime).length
+
+	//if new day check if there are still elements in current or upcoming, if not subscribe to new day or just refresh website
+	if (currentEventsLength == 0 && upcomingEventsLength == 0){
+		client.unsubscribe(subscribeToEvents, () => {
+			subscribeToEvents = `screens/${monitorID}/${currentTime.getDate()}.${currentTime.getMonth()+1}`
+			client.subscribe(subscribeToEvents)
+			console.log('now subscribed to' + subscribeToEvents);
+		})
+	}
+
+	fillCurrent(model)
+	fillUpcoming(model)
+
+	if (upcomingEventsOnChange != upcomingEventsLength
+		|| eventsOnChange != currentEventsLength) {
+		upcomingEventsOnChange = upcomingEventsLength
+		eventsOnChange = currentEventsLength
+		if (!scroll.disableScroll)
+			scroll.reload()
+	}
+}, 60000)
 
 window.addEventListener('load', e => {
 	fillCurrent(model)

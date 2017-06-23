@@ -1,59 +1,9 @@
+console.log(config);
+export let itemDuration = config.itemDuration
+export let graphicScreenDuration = config.graphicScreenDuration
+let disableScroll = config.disableScroll
 
-let itemDuration
-let graphicScreenDuration
-let disableScroll
-
-let loadConfig = (() => {
-	itemDuration = config.itemDuration
-	graphicScreenDuration = config.graphicScreenDuration
-	disableScroll = config.disableScroll
-})()
-
-export let setItemDuration = d => itemDuration = d
-export let setGraphicScreenDuration = d => graphicScreenDuration = d
-window.setDisableScroll = b => {
-	disableScroll = b
-	// if(disableScroll == 0) reload()
-}
-
-let getRandomMinute = (min, max) => {
-	min = min*60000;
-	max = max*60000;
-	min = Math.ceil(min);
-	max = Math.floor(max);
-	return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
-}
-
-
-let changeImage = () => {
-	console.log("random")
-	let content = document.getElementById('graphicContent')
-	// change image to avocado
-	content.style.backgroundImage = "url('/graphic/test.gif')"
-
-	setTimeout(function() {
-			// change image back after 3 minutes
-			content.style.backgroundImage = "url('/graphic/DesigningHope_Full_big.png')"
-			content.style.backgroundRepeat = "no-repeat"
-	}, 3*60000)
-
-	content.style.backgroundRepeat = "no-repeat"
-	content.style.backgroundSize = "contain"
-	content.style.backgroundPosition = "center"
-}
-
-let loopImages = () => {
-    var rand = getRandomMinute(0.5,1)
-	console.log('will change image after: ' + rand);
-    setTimeout(() => {
-            changeImage()
-            loopImages()
-    }, rand)
-}
-
-loopImages()
-
-
+export let setDisableScroll = state => disableScroll = state
 /*
 	toshas pattern:
 	let MakeObject = params => {
@@ -83,7 +33,7 @@ let jobs = (() => {
 			active = true
 			let interval = setInterval(() => {
 				// save only jobs to the list that return true
-				// in our case the job is done it it returns true
+				// in our case the job is done if it returns true
 				for (let i = 0; i < list.length; i ++)
 					if (list[i]()) list[i] = undefined
 				list = list.filter(a => a)
@@ -91,6 +41,7 @@ let jobs = (() => {
 					clearInterval(interval)
 					active = false
 				}
+				console.log(list.length);
 			}, 1000 / config.fps)
 		}
 	}
@@ -104,7 +55,8 @@ let jobs = (() => {
 			list.splice(list.indexOf(job), 1)
 		},
 		clear () {
-			list = []
+			list = new Array()
+			console.log('cleared job list');
 		}
 	}
 })()
@@ -129,10 +81,10 @@ let map = (value, aMin, aMax, bMin, bMax, clamp) => {
 
 // Initialisation for vertical scroll
 let initScrollAnimation = parent => {
-
 	let items = parent.querySelectorAll('.event')
-	if(items.length == 0) items = parent.querySelectorAll('.globalInfo')
+	if (items.length == 0) items = parent.querySelectorAll('.globalInfo')
 	let timeLine = []
+	console.log('there are: ' + items.length + ' items in list');
 	if (items.length > config.itemsProScreen) {
 		let screenNumber = Math.ceil(items.length / config.itemsProScreen)
 		let mod = items.length % config.itemsProScreen
@@ -156,11 +108,13 @@ let initScrollAnimation = parent => {
 				to   : {time : timeAcc, top  : get(i + 1)}
 			})
 		}
-	} else
+	} else {
 		timeLine.push({
 			from : {time : 0, top  : 0},
 			to   : {time : items.length * itemDuration, top : 0}
 		})
+		console.log('less items than itemsProScreen, show for: ' + items.length*itemDuration);
+	}
 	//  4s   0px - 100px  5s
 	//  9s 100px - 200px 10s
 	// 11s 200px -   0px 12s
@@ -172,6 +126,7 @@ let initScrollAnimation = parent => {
 let scrollParent = (parent, end) => {
 	let timeLine = initScrollAnimation(parent)
 	let start = new Date()
+	parent.style.transform = `translateY(0px)`
 	let job = () => {
 		let t = (new Date() - start) / 1000 // elapsed time
 		for (let i = 0; i < timeLine.length; i ++) {
@@ -185,13 +140,16 @@ let scrollParent = (parent, end) => {
 		}
 		if (t > timeLine[timeLine.length - 1].to.time) {
 			end && end()
+			console.log('should delete vertical job');
 			return true // delete me from animation list
 		}
 	}
 	// add animation to jobs
+	console.log('added vertical job');
 	jobs.add(job)
 }
 
+let graphicScrollTimeout
 export let y = end => {
 	console.log('should now scroll vertically');
 	let screens = document.querySelectorAll('.screen')
@@ -200,10 +158,24 @@ export let y = end => {
 			let left = screens[i].getBoundingClientRect().left
 			let list = screens[i].querySelector('.list .listScroller')
 			if (-3 < left) {
-				if (list)
+				if (list){
+					console.log('now scroll screen with list');
 					scrollParent(list, end)
-				else
-					setTimeout(end, graphicScreenDuration * 1000)
+				}
+				else {
+					console.log('screen has no list, wait for: ' + graphicScreenDuration * 1000);
+					// graphicScrollTimeout = setTimeout(end, graphicScreenDuration * 1000)
+
+					let beg = new Date()
+					jobs.add(() => {
+						let t = (new Date() - beg) / 1000 // elapsed time
+						if (t > graphicScreenDuration) {
+							console.log('done scroll for screen with no list');
+							end && end()
+							return true // delete me from animation list
+						}
+					})
+				}
 				break
 			}
 		}
@@ -238,44 +210,43 @@ export let x = (() => {
 		}
 		let job = () => {
 			let d = parseInt((new Date() - start) / 1000) // elapsed time
-			// if (d == transitionTime)
 			for (var i = 0; i < visibleScreens.length; i ++)
 				visibleScreens[i].style.transform = `translateX(${-screenTo}px)`
-			// document.body.scrollLeft = t
-			// if done delete us from animation list
 
 			if (d > transitionTime) {
 				end && end()
-				// console.log('delete horizontal scroll');
+				console.log('should delete horizontal job');
 				return true // delete me from animation list
 			}
 		}
 		// add animation to jobs
+		console.log('added horizontal job');
 		jobs.add(job)
 	}
 })()
 
 
 
-window.showScreen = id => {
-	let start      = new Date()
+export let showScreen = id => {
+	stop()
+	clearTimeout(graphicScrollTimeout)
+	let beg      = new Date()
 	let screens        = document.querySelectorAll('.screen')
 	let visibleScreens = []
 	for (var i = 0; i < screens.length; i++) {
-		if (screens[i].style.display != 'none') {
+		if (screens[i].style.display != 'none')
 				visibleScreens.push(screens[i])
-		}
 	}
 	let left = visibleScreens[id].offsetLeft
 
 	let job = () => {
-		let d = parseInt((new Date() - start) / 1000) // elapsed time
-
+		let d = parseInt((new Date() - beg) / 1000) // elapsed time
 		for (var i = 0; i < visibleScreens.length; i ++)
 			visibleScreens[i].style.transform = `translateX(${-left}px)`
-
 		if (d > 1) {
-			reload()
+			console.log('delete showscreen transition');
+			dir = false
+			start()
 			return true // delete me from animation list
 		}
 	}
@@ -287,7 +258,7 @@ window.showScreen = id => {
 // main function for continously switching between horizontal and vertical scrolling
 let dir = false
 export let start = () => {
-	console.log('disableScroll is set to: ' + disableScroll);
+	console.log('dir:', dir? 'horizontal' : 'vertical');
 	if (dir && !disableScroll) x(start)
 	else y(start)
 	dir = !dir
@@ -299,5 +270,19 @@ export let reload = () => {
 	stop()
 	// document.body.scrollLeft = 0
 	dir = false
-	start()
+	let screens        = document.querySelectorAll('.screen')
+	for (var i = 0; i < screens.length; i++) {
+		if (screens[i].style.display != 'none') {
+			screens[i].style.transform = `translateX(0px)`
+		}
+	}
+	let beg = new Date()
+	jobs.add(() => {
+		let t = (new Date() - beg) / 1000 // elapsed time
+		if (t > 1.1) {
+			console.log('start is executed');
+			start()
+			return true // delete me from animation list
+		}
+	})
 }
