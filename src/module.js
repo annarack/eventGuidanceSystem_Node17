@@ -1,5 +1,8 @@
 
 export default {
+	days : {
+
+	},
 	events : [
 
 	],

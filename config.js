@@ -1,4 +1,8 @@
 
+let timeShift = new Date()
+timeShift.setDate(27)
+timeShift.setHours(1)
+
 var config = {
 	mqttBroker 				: 'ws://192.168.2.114:9001',
 	// mqttBroker 				:'mqtt://test.mosquitto.org:8080',
@@ -8,5 +12,7 @@ var config = {
 	itemsProScreen          : 5,
 	fps                     : 30,
 	graphicScreenDuration	: 5,
-	disableScroll           : 0
+	disableScroll           : 0,
+	timeTest				: timeShift,
+	avocadoRange			: 30  // minutes
 }
