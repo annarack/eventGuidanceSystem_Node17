@@ -16,16 +16,15 @@ window.showScreen = scroll.showScreen
 let client  = mqtt.connect(mqttBroker)
 
 
-let currentTime = new Date("June 26, 2017 12:00:00")
-let timeSpan    = new Date("June 26, 2017 12:00:00")
-// let currentTime   = new Date()
-// //events starttime should be earlier than timeSpan to be displayed as upcoming
-// let timeSpan      = new Date()
+let currentTime = new Date()  //Date("June 26, 2017 12:00:00")
+let timeSpan    = new Date()  //Date("June 26, 2017 12:00:00")
+
 timeSpan.setHours(timeSpan.getHours()+2)
 timeSpan.setMinutes(timeSpan.getMinutes()+ 50)
 console.log('currentTime: ' + currentTime);
 console.log('timespan: ' + timeSpan);
 
+let currentDay = currentTime.getDate()
 
 let subscribeToEvents = `screens/${monitorID}/${currentTime.getDate()}.${currentTime.getMonth()+1}`
 
@@ -49,9 +48,10 @@ client.on('connect', () => {
 client.on('message', (topic, message) => {
 	// message is Buffer
 	// let model = message.toString()
-	message = JSON.parse(message)
-	for (let i in message) if (model[i]) model[i] = message[i]
 	console.log('received new data');
+	message = JSON.parse(message)
+	console.log(message);
+	for (let i in message) if (model[i]) model[i] = message[i]
 	console.log(model);
 
 	if (topic == subscribeToEvents) {
@@ -70,7 +70,7 @@ client.on('message', (topic, message) => {
 	if (topic == gfxScreenDurationTop)
 		scroll.graphicScreenDuration = message
 	if (topic == disableScrollTop)
-		disableScroll = message
+		scroll.setDisableScroll(message)
 	if (topic == showScreenTop)
 		scroll.showScreen(message)
 })
@@ -84,7 +84,7 @@ let timeToDate = time => {
 	dateTime.setHours(timeParts[0])
 	dateTime.setMinutes(timeParts[1])
 	dateTime.setSeconds('00')
-
+	console.log(dateTime);
 	return dateTime
 }
 
@@ -93,7 +93,6 @@ let sortEvents = (a,b) =>
 
 let fillCurrent = model => {
 	let templates = ''
-
 	model.events
 		.filter(event =>
 			timeToDate(event.start) <= currentTime &&
@@ -172,11 +171,10 @@ let getRandomMinute = (min, max) => {
 	return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
 }
 
-
 let changeImage = () => {
 	let content = document.getElementById('graphicContent')
 	// change image to avocado
-	content.style.backgroundImage = "url('/graphic/test.gif')"
+	content.style.backgroundImage = "url('/graphic/avocado-16-9.gif')"
 	setTimeout(function() {
 			// change image back after 3 minutes
 			content.style.backgroundImage = "url('/graphic/DesigningHope_Full_big.png')"
@@ -188,7 +186,7 @@ let changeImage = () => {
 }
 
 let loopImages = () => {
-    var rand = getRandomMinute(1,3)
+    var rand = getRandomMinute(1,10)
 	console.log('will change image after: ' + rand);
     setTimeout(() => {
             changeImage()
@@ -202,19 +200,20 @@ let eventsOnChange = -1
 
 
 setInterval(() =>{
-	currentTime = new Date("June 26, 2017 12:01:00")
+	currentTime = new Date() //Date("June 26, 2017 12:01:00")
 
 	let currentEventsLength = model.events.filter(event =>
 		timeToDate(event.start) <= currentTime &&
 		currentTime <= timeToDate(event.end)).length
 	let upcomingEventsLength = model.events.filter(eventItem =>
-		timeToDate(eventItem.start) < timeSpan &&
 		timeToDate(eventItem.start) > currentTime).length
 
 	//if new day check if there are still elements in current or upcoming, if not subscribe to new day or just refresh website
 	if (currentEventsLength == 0 && upcomingEventsLength == 0){
 		client.unsubscribe(subscribeToEvents, () => {
-			subscribeToEvents = `screens/${monitorID}/${currentTime.getDate()}.${currentTime.getMonth()+1}`
+			let day = (currentDay != currentTime.getDate() ? currentTime.getDate() : currentTime.getDate()+1)
+
+			subscribeToEvents = `screens/${monitorID}/${day}.${currentTime.getMonth()+1}`
 			client.subscribe(subscribeToEvents)
 			console.log('now subscribed to' + subscribeToEvents);
 		})

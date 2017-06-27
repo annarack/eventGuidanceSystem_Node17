@@ -22,11 +22,11 @@ var config = {
 				exclude	: /node_modules/
 			},
 			{
-				test: /\.(ttf|svg)$/,
+				test: /\.(ttf|svg|gif)$/,
 				loader: 'file-loader?name=./graphic/[name].[ext]'
 			},
 			{
-				test: /\.(jpg|jpeg|png|svg)$/,
+				test: /\.(jpg|jpeg|png|svg|gif)$/,
 				loader: 'url-loader'
 			}
 		]
@@ -55,7 +55,8 @@ if (env.target == 'client') Object.assign(config, {
 		inline      : true,
 		hot         : true,
 		port        : 8000,
-		host		: '192.168.96.127' //'192.168.2.114'
+		host		: '192.168.2.114'
+		//  '192.168.1.20' //'192.168.96.127' '192.168.2.114'
 	},
 	plugins : [
 		new webpack.HotModuleReplacementPlugin()

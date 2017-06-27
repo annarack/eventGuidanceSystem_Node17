@@ -163,7 +163,7 @@ export let y = end => {
 					scrollParent(list, end)
 				}
 				else {
-					console.log('screen has no list, wait for: ' + graphicScreenDuration * 1000);
+					// console.log('screen has no list, wait for: ' + graphicScreenDuration * 1000);
 					// graphicScrollTimeout = setTimeout(end, graphicScreenDuration * 1000)
 
 					let beg = new Date()
@@ -266,21 +266,35 @@ export let start = () => {
 
 export let stop = () => jobs.clear()
 
+export let reloadVertical = () => {
+	stop()
+}
+
+let numVisibleScreensOnChange = 0
 export let reload = () => {
 	stop()
-	// document.body.scrollLeft = 0
 	dir = false
 	let screens        = document.querySelectorAll('.screen')
+	let visibleScreens = []
+	let numVisibleScreens = 0
 	for (var i = 0; i < screens.length; i++) {
-		if (screens[i].style.display != 'none') {
-			screens[i].style.transform = `translateX(0px)`
+		if (screens[i].style.display != 'none'){
+			numVisibleScreens += 1
+			visibleScreens.push(screens[i])
 		}
+	}
+	if (numVisibleScreens != numVisibleScreensOnChange){
+		console.log('amount of screens changed so reset to first screen');
+		for (var i = 0; i < visibleScreens.length; i++) {
+			visibleScreens[i].style.transform = `translateX(0px)`
+		}
+		numVisibleScreensOnChange = numVisibleScreens
 	}
 	let beg = new Date()
 	jobs.add(() => {
 		let t = (new Date() - beg) / 1000 // elapsed time
 		if (t > 1.1) {
-			console.log('start is executed');
+			console.log('start is executed on reload');
 			start()
 			return true // delete me from animation list
 		}
